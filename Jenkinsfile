@@ -16,7 +16,7 @@ pipeline {
 
         stage('execute terraform') {
             steps {
-                sh "sed '1,35 s/CONTAINER_API_VAR_REPLACE/"+ $dockerTag + "/g' ecs-change > ecs.tf"
+                sh "sed '1,35 s/CONTAINER_API_VAR_REPLACE/${dockerTag}/g' ecs-change > ecs.tf"
             }
         }
         
