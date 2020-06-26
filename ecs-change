@@ -1,5 +1,5 @@
-resource "aws_ecs_task_definition" "APIRestSmallCompany1" {
-    family = "APIRestSmallCompany-${var.SUFIX}1"
+resource "aws_ecs_task_definition" "APIRestSmallCompany" {
+    family = "APIRestSmallCompany-${var.SUFIX}"
     container_definitions = <<TASK_DEFINITION
     [{
         "portMappings": [{
