@@ -19,7 +19,7 @@ pipeline {
         stage('execute terraform') {
             steps {
                 script {
-                    if (dockerTagcontains.('beta')) {
+                    if (dockerTag.contains('beta')) {
                         variablesDef = 'develop'
                     } else {
                         variablesDef = 'master'
