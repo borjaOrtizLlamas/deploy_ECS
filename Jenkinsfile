@@ -14,8 +14,6 @@ pipeline {
             }
         }
 
-
-
         stage('execute terraform') {
             steps {
                 script {
@@ -24,8 +22,8 @@ pipeline {
                     } else {
                         variablesDef = 'master'
                     }
-                    sh "sed '1,35 s/CONTAINER_API_VAR_REPLACE/${dockerTag}/g' ecs-change > ECS.tf"
-                    sh "export TF_LOG=DEBUG  && terraform init && terraform refresh -var-file=\"envs/variables_${variablesDef}.tfvars\" && terraform plan  -var-file=\"envs/variables_${variablesDef}.tfvars\""
+                    sh "rm ECS.tf && export TF_LOG=DEBUG && sed '1,35 s/CONTAINER_API_VAR_REPLACE/${dockerTag}/g' ecs-change > ECS.tf"
+                    sh "terraform init && terraform refresh -var-file=\"envs/variables_${variablesDef}.tfvars\" && terraform plan  -var-file=\"envs/variables_${variablesDef}.tfvars\""
                     input(message : 'do you want to deploy this build to dev?')
                 }
             }
