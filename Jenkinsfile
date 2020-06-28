@@ -1,5 +1,4 @@
-def variablesDef = null
-def suffix = null
+def aviableToProduction = null
 
 pipeline {
    agent any
@@ -15,32 +14,36 @@ pipeline {
             }
         }
 
-        stage('execute terraform') {
+        stage('build task ') {
             steps {
                 script {
                     if (dockerTag.contains('beta')) {
-                        variablesDef = 'develop'
-                        suffix="DEV"
+                        aviableToProduction = false
                     } else {
-                        variablesDef = 'master'
-                        suffix="PRO"
+                        aviableToProduction = true
 
                     }
                     sh "rm ECS.tf && export TF_LOG=DEBUG && sed '1,35 s/CONTAINER_API_VAR_REPLACE/${dockerTag}/g' ecs-change > ECS.tf"
-                    sh "terraform init && terraform refresh -var-file=\"envs/variables_${variablesDef}.tfvars\" && terraform plan  -var-file=\"envs/variables_${variablesDef}.tfvars\""
-                    input(message : 'do you want to deploy this build to dev?')
+                    sh "terraform init && terraform refresh -var-file=\"envs/variables_develop.tfvars\" && terraform plan  -var-file=\"envs/variables_develop.tfvars\""
                 }
             }
         }
-        stage('deploy terraform') {
+        stage('deploy to dev') {
             steps {
-                sh "export TF_LOG=DEBUG &&  terraform apply -input=false -auto-approve  -var-file=\"envs/variables_${variablesDef}.tfvars\""
-                sh "aws ecs update-service --cluster api_rest_cluster-${suffix} --service serviceApiRest-${suffix} --task-definition APIRestSmallCompany-${suffix}"
-
-
+                input(message : 'do you want to deploy this task to dev?')
+                sh "export TF_LOG=DEBUG &&  terraform apply -input=false -auto-approve  -var-file=\"envs/variables_develop.tfvars\""
+                sh "aws ecs update-service --cluster api_rest_cluster-DEV --service serviceApiRest-DEV --task-definition APIRestSmallCompany-DEV"
             }
         }
 
+        stage('deploy to pro') {
+            steps {
+                sh "terraform init && terraform refresh -var-file=\"envs/variables_develop.tfvars\" && terraform plan  -var-file=\"envs/variables_develop.tfvars\""
+                input(message : 'do you want to deploy this task to pro?')
+                sh "export TF_LOG=DEBUG &&  terraform apply -input=false -auto-approve  -var-file=\"envs/variables_master.tfvars\""
+                sh "aws ecs update-service --cluster api_rest_cluster-PRO --service serviceApiRest-PRO --task-definition APIRestSmallCompany-PRO"
+            }
+        }
         
     }
 }
