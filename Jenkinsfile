@@ -35,7 +35,7 @@ pipeline {
         stage('deploy terraform') {
             steps {
                 sh "export TF_LOG=DEBUG &&  terraform apply -input=false -auto-approve  -var-file=\"envs/variables_${variablesDef}.tfvars\""
-                sh "aws ecs update-service --service serviceApiRest-${suffix} --task-definition APIRestSmallCompany-${suffix}"
+                sh "aws ecs update-service --cluster api_rest_cluster-${suffix} --service serviceApiRest-${suffix} --task-definition APIRestSmallCompany-${suffix}"
 
 
             }
