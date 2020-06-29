@@ -17,11 +17,10 @@ pipeline {
         stage('build task ') {
             steps {
                 script {
-                    if (dockerTag.contains('beta')) {
-                        aviableToProduction = false
-                    } else {
+                    if (dockerTag.contains('-pro')) {
                         aviableToProduction = true
-
+                    } else {
+                        aviableToProduction = false
                     }
                     sh "rm ECS.tf && export TF_LOG=DEBUG && sed '1,35 s/CONTAINER_API_VAR_REPLACE/${dockerTag}/g' ecs-change > ECS.tf"
                     sh "terraform init && terraform refresh -var-file=\"envs/variables_develop.tfvars\" && terraform plan  -var-file=\"envs/variables_develop.tfvars\""
