@@ -38,10 +38,14 @@ pipeline {
 
         stage('deploy to pro') {
             steps {
-                sh "terraform init && terraform refresh -var-file=\"envs/variables_develop.tfvars\" && terraform plan  -var-file=\"envs/variables_develop.tfvars\""
-                input(message : 'do you want to deploy this task to pro?')
-                sh "export TF_LOG=DEBUG &&  terraform apply -input=false -auto-approve  -var-file=\"envs/variables_master.tfvars\""
-                sh "aws ecs update-service --cluster api_rest_cluster-PRO --service serviceApiRest-PRO --task-definition APIRestSmallCompany-PRO"
+                script {
+                    if(aviableToProduction == true){
+                        sh "terraform init && terraform refresh -var-file=\"envs/variables_develop.tfvars\" && terraform plan  -var-file=\"envs/variables_develop.tfvars\""
+                        input(message : 'do you want to deploy this task to pro?')
+                        sh "export TF_LOG=DEBUG &&  terraform apply -input=false -auto-approve  -var-file=\"envs/variables_master.tfvars\""
+                        sh "aws ecs update-service --cluster api_rest_cluster-PRO --service serviceApiRest-PRO --task-definition APIRestSmallCompany-PRO"
+                    }
+                }
             }
         }
         
