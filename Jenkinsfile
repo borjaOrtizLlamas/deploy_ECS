@@ -43,6 +43,8 @@ pipeline {
                         input(message : 'do you want to deploy this task to pro?')
                         sh "export TF_LOG=DEBUG &&  terraform apply -input=false -auto-approve  -var-file=\"envs/variables_master.tfvars\""
                         sh "aws ecs update-service --cluster api_rest_cluster-PRO --service serviceApiRest-PRO --task-definition APIRestSmallCompany-PRO"
+                    } else {
+                        echo "para subir a producción tiene que ser de un container desde la rama"
                     }
                 }
             }
