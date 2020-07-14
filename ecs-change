@@ -20,6 +20,16 @@ resource "aws_ecs_task_definition" "APIRestSmallCompany" {
         "essential": true,
         "name": "smallComerceApiRest",
         "cpu": 0
+    },{
+        "mountPoints": [{
+            "readOnly": false,
+            "containerPath": "/var/log/",
+            "sourceVolume": "logs"
+        }],
+        "image": "005269061637.dkr.ecr.eu-west-1.amazonaws.com/filebeats_unir:latest",
+        "essential": true,
+        "name": "filebeatsUnir",
+        "cpu": 0
     }]
     TASK_DEFINITION
     volume {
